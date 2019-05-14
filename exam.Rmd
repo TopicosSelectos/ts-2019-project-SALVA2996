@@ -1,0 +1,142 @@
+---
+title: "ts-2019-project-SALVA2996"
+author: "Salvador Nevarez"
+date: "May 14, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#install.packages("tidyverse")
+library(tidyverse)
+```
+
+1.- Create a numeric vector that contains the months of a year. Then, create another vector containing the name for each month. Later, you should assign the months and names. Finally, you should select and display the months related to the summer season (June, July, August)
+
+```{r cars}
+months_year <- 1:12
+months_names <- c("January","February","March","April","May","June","July","August","September","October","November","December")
+names(months_year) <- months_names
+months_year
+summer_months <- months_names[6:8]
+summer_months
+```
+
+2.- Construct a matrix with 5 rows containing the numbers 1 up to 15, filled row-wise.
+
+```{r pressure, echo=FALSE}
+ex2_vector <- 1:15
+ex2_matrix <- matrix(ex2_vector, nrow = 5, byrow = TRUE)
+ex2_matrix
+```
+
+3.-Create a factor with these observations "XXL", "XXL", "XXL", "XL", "L", "M", "M", "S", "S", "S" and print a summary
+
+```{r}
+ex3_size_vector <- c("XXL", "XXL", "XXL", "XL", "L", "M", "M", "S", "S", "S")
+ex3_size_factor <- factor( ex3_size_vector )
+summary(ex3_size_factor)
+```
+
+4.- Create and print a data frame that should contain:
+
+-- 5 of your courses (e.g. Fundamentals of Programming, Object-Oriented Programming, Databases, etc ).
+-- 5 of your marks
+-- 5 of your professors' names
+
+```{r}
+ex4_subjects <- c("Math 1","Math 1","Canicas 1","Canicas 2","Dibujo")
+ex4_marks <- c(7,10,9,5,5)
+ex4_teachers <- c("Juan Gabriel","Paquita Barrio","Ramón Ayala","John Doe","Bruce Wayne")
+ex4_subjects_frame <- data.frame(Subject = ex4_subjects, Marks = ex4_marks, Teacher = ex4_teachers)
+ex4_subjects_frame
+```
+
+5.- Load the dataset labeled as ITU_WB.csv that is located in the data folder and storage this dataset in a variable called itu. Then, you should describe the composition of the dataset. This description must contain the number of observations, variables and the type of each variable
+
+```{r}
+itu <- read.csv("C:/Users/salva/Desktop/repo/ts-2019-project-SALVA2996/data/ITU_WB.csv")
+
+# str(itu)
+
+print("The dataset is composed by 3,735 instances. Each one with 12 variables. From start to finish, each variable accepts:")
+print("num: numeric integer")
+print("Economy: factor")
+print("Code: factor")
+print("Region: factor")
+print("Income.group: factor")
+print("year: numeric integer")
+print("Internet.value: numeric float")
+print("Total.population: numeric integer")
+print("GDP $US: numeric float")
+print("Life Expectancy (years): numeric float")
+print("GDP per capita income: numeric float")
+print("Fertility births per woman: numeric float")
+```
+
+6.- Filter the itu dataset to retrieve only the observation from Mexico, grouped by year and in descending order selecting the "Internet value" column
+
+```{r}
+itu %>%
+  filter(Economy == "Mexico") %>%
+  group_by(year) %>%
+  arrange(desc(Internet.value))
+```
+
+7.- Create a new variable called itu_by_year grouping per "year" and "Income group" variables. Then, remove NAs observations. Later, using the function summarize() you should estimate the median of the Internet value variable and store it in a variable called "medianValue"
+
+```{r}
+
+args(summarize)
+
+itu_by_year <- itu %>%
+  drop_na(Income.group,Internet.value) %>%
+  group_by(year,Income.group) %>%
+  summarize(medianValue = median(Internet.value))
+
+itu_by_year
+```
+
+8.-Create a line plot to visualize trends over time. You should use the variables created in the itu_by_year dataset
+
+```{r}
+ggplot(itu_by_year, aes(x = year, y = medianValue)) +
+  geom_line() +
+  geom_smooth(method = "lm")
+
+```
+
+9.- Create a new variable called itu_latin filtering per Region, selecting Latin America & Caribbean and grouping per Income group.
+
+Then, using this dataset, create a plot visualizing the relationship between Internet value and GDP (US$) colored per Income group and faceting per Economy.
+
+```{r}
+itu_latin <- itu %>%
+  drop_na(Income.group) %>%
+  filter(Region == "Latin America & Caribbean") %>%
+  group_by(Income.group)
+
+ggplot(itu_latin, aes(x = Internet.value, y = GDP..US.., color = Income.group)) +
+  geom_point() + 
+  facet_wrap(~ Economy)
+```
+
+10.- Create a new variable called itu_2017 filtering the year 2017 and removing observations that contain NAs.
+
+Then, using this dataset, create a plot visualizing the relationship between Internet value and GDP (US$), colored per Income group. Furthermore, you should use a log scale in both axes ("x" and "y"). Finally, you should use the facet function in order to wrap by Region.
+
+```{r}
+itu_2017 <- itu %>%
+  drop_na(year, Region) %>%
+  filter(year == 2017)
+
+ggplot(itu_2017, aes(x = Internet.value, y = GDP..US.., color = Income.group)) +
+  geom_point() +
+  scale_x_log10() +
+  scale_y_log10() +
+  facet_wrap(~ Region)
+
+```
+
+
+
